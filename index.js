@@ -1,0 +1,1 @@
+const word = require('word')
