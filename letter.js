@@ -1,18 +1,20 @@
 function Letter(letter) {
-    this.placeholder = "_"
-    this.letter = letter
+    this.placeholder = " ___ "
+    this.letter = String(letter).toUpperCase()
     this.isGuessed = false
 
 }
 
-Letter.prototype.getLetter = function(){
+Letter.prototype.getLetter = function () {
     return this.letter
 }
 
 Letter.prototype.guessLetter = function (letter) {
-    this.isGuessed = letter === this.letter
+    if (!this.isGuessed) {
+        this.isGuessed = letter === this.letter
+    }
 }
 
-exports.letter = {
-    Letter
+module.exports = {
+    Letter: Letter
 }
