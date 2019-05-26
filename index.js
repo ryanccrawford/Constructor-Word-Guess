@@ -2,31 +2,31 @@ const word = require('./word')
 const inquirer = require('inquirer')
 const RandomWord = require('random-word')
 var questions = [{
-        type: 'input',
-        name: 'guess',
-        message: "Choose a Letter:",
-        validate: function (value) {
-            var pass = value.match(
-                /[a-z]{1}/i
-            );
-            if (value.length > 1) {
-                return 'Please only enter 1 character at a time.'
-            }
-            if (pass) {
-                return true
-            }
-
-            return 'Please enter only 1 letter a - z'
+    type: 'input',
+    name: 'guess',
+    message: "Choose a Letter:",
+    validate: function (value) {
+        var pass = value.match(
+            /[a-z]{1}/i
+        );
+        if (value.length > 1) {
+            return 'Please only enter 1 character at a time.'
         }
+        if (pass) {
+            return true
+        }
+
+        return 'Please enter only 1 letter a - z'
+    }
 
 }]
 var playagain = {
-        type: 'list',
-        name: 'playAgain',
-        message: "Play Again?",
-    choices: ['Yes','No']
+    type: 'list',
+    name: 'playAgain',
+    message: "Play Again?",
+    choices: ['Yes', 'No']
 }
-var startGame = [{
+var options = [{
     type: 'list',
     name: 'level',
     message: "Select difficulty level (0 - 5) Default = 2",
@@ -36,12 +36,10 @@ var startGame = [{
     type: 'list',
     name: 'guesses',
     message: "Number of guesses (4 - 10) Default = 6",
-        choices: [4, 5, 6, 7, 8, 9, 10],
+    choices: [4, 5, 6, 7, 8, 9, 10],
     default: 2
-}
-]
+}]
 var player = {
-    level: 0,
     guesses: 0,
     biggestWord: 0,
     guessedLetters: [],
@@ -68,50 +66,52 @@ var player = {
 let Word = word.Word
 let gameWord = {}
 
-gameOptions()
 
 function gameOptions() {
     console.clear()
-      inquirer.prompt(startGame).then(function (response) {
-          player.biggestWord = response.level + 6 
-          player.level = response.level
-          player.guesses = response.guesses
+    inquirer.prompt(options).then(function (response) {
+        player.biggestWord = parseInt(response.level) + 6
+        player.guesses = parseInt(response.guesses)
         initGame()
+    }).catch(function (error) {
+        console.log(error)
 
-      })
+    })
 }
-function getWord(maxLetters) {
+
+function getWord() {
     var word = ''
-    while (word.length < 4 && word.length > player.biggestWord) {
+    while (word.length < 4 || word.length > player.biggestWord) {
         word = RandomWord()
     }
-     return word
+    return word
 }
+
 function initGame() {
     console.clear()
     gameWord = {}
     player.resetLettersGuessed()
-    var rword = getWord(player.biggestWord)
+    var rword = getWord()
     gameWord = new Word(rword)
     startGame("Welcome to the game!")
 }
 
 function startGame(message = '') {
     displayWord(message)
-   var playerMessage = message
+    var playerMessage = message
     if (player.guesses > 0 && gameWord.lettersLeft() > 0) {
         playerMessage = ''
         inquirer.prompt(questions).then(function (answers) {
-         
+
             var playerGuess = String(answers.guess).toUpperCase()
             if (playerGuess.length > 1) {
                 message = "Entered too many letters. Enter just one letter"
             } else {
-        
+
                 if (player.hasGuessed(playerGuess)) {
-                
+
                     playerMessage = 'You have already picked ' + playerGuess
-               
+
                 } else {
                     var isCorrect = gameWord.guess(playerGuess)
                     if (!isCorrect) {
@@ -135,11 +135,11 @@ function startGame(message = '') {
             console.log('You Got it!')
             console.log('You get a bounus of 4 guesses.')
             console.log(`You now have a total of ${player.guesses} guesses.`)
-            
+
             inquirer.prompt(playagain).then(function (response) {
                 if (response.playAgain === "Yes") {
                     initGame()
-                    
+
                 } else {
                     endGame()
                 }
@@ -148,14 +148,14 @@ function startGame(message = '') {
             console.log("Sorry, the word was " + String(gameWord.word).toUpperCase())
             player.looses++
             player.guesses = 4
-             inquirer.prompt(playagain).then(function (response) {
-                 if (response.playAgain === "Yes") {
-                     initGame()
+            inquirer.prompt(playagain).then(function (response) {
+                if (response.playAgain === "Yes") {
+                    initGame()
 
-                 } else {
-                     endGame()
-                 }
-             })
+                } else {
+                    endGame()
+                }
+            })
         }
 
 
@@ -185,5 +185,7 @@ function displayWord(_message) {
     } else {
         console.log('')
     }
-   
+
 }
+
+gameOptions()
