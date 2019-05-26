@@ -5,7 +5,7 @@ function Word(newWord) {
     this.word = newWord
     this.wordArray = this.createWordArray()
     this.letters = this.createLetters()
-    this.length = newWord.length
+    this.length = this.letters.length
     this.isGuessed = false
 
 }
@@ -51,14 +51,16 @@ Word.prototype.toString = function () {
 Word.prototype.guess = function (_letter) {
     var points = 0
     this.letters.forEach(function (l) {
-        console.log(l)
+        if (l.isGuessed) {
+            return;
+        }
         l.guessLetter(_letter)
-        console.log(l.isGuessed)
+
         if (l.isGuessed) {
             points++
         }
     })
-    return points !== 0 ? true : false
+    return points
 }
 
 module.exports = {
