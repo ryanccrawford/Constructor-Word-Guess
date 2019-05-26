@@ -25,9 +25,25 @@ var playagain = {
         name: 'playAgain',
         message: "Play Again?",
     choices: ['Yes','No']
-    }
+}
+var startGame = [{
+    type: 'list',
+    name: 'level',
+    message: "Select difficulty level (0 - 5) Default = 2",
+    choices: [0, 1, 2, 3, 4, 5],
+    default: 2
+}, {
+    type: 'list',
+    name: 'guesses',
+    message: "Number of guesses (4 - 10) Default = 6",
+        choices: [4, 5, 6, 7, 8, 9, 10],
+    default: 6
+}
+]
 var player = {
-    guesses: 4,
+    level: 0,
+    guesses: 0,
+    biggestWord: 0,
     guessedLetters: [],
     toString: function () {
         return this.guessedLetters.join(" ")
@@ -52,12 +68,30 @@ var player = {
 let Word = word.Word
 let gameWord = {}
 
-initGame()
+gameOptions()
 
+function gameOptions() {
+    console.clear()
+      inquirer.prompt(startGame).then(function (response) {
+          player.biggestWord = response.level + 6 
+          player.level = response.level
+          player.guesses = response.guesses
+              initGame()
+
+      })
+}
+function getWord(maxLetters) {
+    var word = ''
+    while (word.length < 4 && word.length > maxLetter) {
+        word = RandomWord()
+    }
+     return word
+}
 function initGame() {
+    console.clear()
     gameWord = {}
     player.resetLettersGuessed()
-    var rword = RandomWord()
+    var rword = getWord(player.biggestWord)
     gameWord = new Word(rword)
     startGame("Welcome to the game!")
 }
@@ -112,8 +146,16 @@ function startGame(message = '') {
             })
         } else {
             console.log("Sorry, the word was " + String(gameWord.word).toUpperCase())
-            
-            endGame()
+            player.looses++
+            player.guesses = 4
+             inquirer.prompt(playagain).then(function (response) {
+                 if (response.playAgain === "Yes") {
+                     initGame()
+
+                 } else {
+                     endGame()
+                 }
+             })
         }
 
 
