@@ -37,7 +37,7 @@ var startGame = [{
     name: 'guesses',
     message: "Number of guesses (4 - 10) Default = 6",
         choices: [4, 5, 6, 7, 8, 9, 10],
-    default: 6
+    default: 2
 }
 ]
 var player = {
@@ -76,13 +76,13 @@ function gameOptions() {
           player.biggestWord = response.level + 6 
           player.level = response.level
           player.guesses = response.guesses
-              initGame()
+        initGame()
 
       })
 }
 function getWord(maxLetters) {
     var word = ''
-    while (word.length < 4 && word.length > maxLetter) {
+    while (word.length < 4 && word.length > player.biggestWord) {
         word = RandomWord()
     }
      return word
